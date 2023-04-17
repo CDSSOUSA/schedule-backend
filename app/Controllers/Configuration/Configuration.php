@@ -76,6 +76,16 @@ class Configuration extends ResourceController
 
         if (!$val) {
 
+            // $response = [
+            //     'status' => 'ERROR',
+            //     'error' => true,
+            //     'code' => 400,
+            //     'msg' => $this->messageError->getMessageError(),
+            //     'msgs' => $this->validator->getErrors()
+            // ];
+
+            // return $this->response->setJSON($response);
+
             $response = [
                 'status' => 'ERROR',
                 'error' => true,
@@ -84,7 +94,7 @@ class Configuration extends ResourceController
                 'msgs' => $this->validator->getErrors()
             ];
 
-            return $this->response->setJSON($response);
+            return $this->fail($response);
         }
 
         $endDayWeek = $this->request->getPost('startDayWeek') + ($this->request->getPost('qtdeDayWeek') - 1);
@@ -98,8 +108,8 @@ class Configuration extends ResourceController
                 'msg' => $this->messageError,
                 'msgs' => ['error' => 'estorou o domingo']
             ];
-
-            return $this->response->setJSON($response);
+            return $this->fail($response);
+            //return $this->response->setJSON($response);
         }
 
 
@@ -138,7 +148,11 @@ class Configuration extends ResourceController
                     //'id' =>  $this->disciplineModel->getInsertID()
                     'data' => $data
                 ];
-                return $this->response->setJSON($response);
+                //return $this->response->setJSON($response);
+                return $this->respondCreated([
+                    'success' => 'success',
+
+                ], 'Operação realizada com sucesso!');
             }
         } catch (Exception $e) {
 

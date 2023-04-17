@@ -40,12 +40,50 @@ $routes->group('/config',['namespace'=>'App\Controllers\Configuration'],function
 
 $routes->group('/year',['namespace'=>'App\Controllers\Year',/*'filter'=>'accessFilter'*/],function ($routes){
      
-    $routes->get('show/(:any)', 'Year::showById/$1');  
-    $routes->get('list', 'Year::list'); 
+    $routes->get('show/(:any)', 'Year::show/$1');  
+    $routes->get('/', 'Year::list'); 
     $routes->get('active', 'Year::getYearActive'); 
     $routes->post('create', 'Year::create');
-    $routes->post('update', 'Year::updateData');  
+    $routes->post('update', 'Year::update');  
    
+});
+
+$routes->group('/discipline',['namespace'=>'App\Controllers\Discipline'],function ($routes){
+    //$routes->get('/','Discipline::show');
+    $routes->get('/','Discipline::list');    
+    $routes->get('show/(:any)','Discipline::show/$1');    
+    $routes->post('create', 'Discipline::create'); 
+    $routes->post('update', 'Discipline::update'); 
+    $routes->post('delete', 'Discipline::delete'); 
+});
+
+$routes->group('/series',['namespace'=>'App\Controllers\Series',/*'filter'=>'accessFilter'*/],function ($routes){
+   
+    $routes->get('show/(:any)', 'Series::show/$1');
+    $routes->get('/', 'Series::list');
+   // $routes->get('list', 'Series::listSeries');
+    $routes->get('list/shift/(:any)', 'Series::listSeriesByShift/$1');
+    $routes->get('edit/(:any)', 'Series::show/$1');
+    $routes->post('active', 'Series::active');
+    $routes->post('create', 'Series::create');
+    $routes->post('update', 'Series::update');
+   
+});
+
+$routes->group('/schedule',['namespace'=>'App\Controllers\Schedule'],function ($routes){
+    // $routes->get('/','Horario::index');
+    // $routes->get('add_profissional_horario/(:any)/(:any)/(:any)','Horario::addProfissionalHorario/$1/$2/$3');   
+    // $routes->post('add', 'Horario::add'); 
+    $routes->get('getAllocation/(:any)','Schedule::getAllocation/$1');    
+    $routes->get('getOcupationSchedule/(:any)','Schedule::getOcupationSchedule/$1');    
+    $routes->post('create','Schedule::create');    
+    $routes->get('delete/(:any)','Schedule::deleteSchedule/$1');    
+    $routes->post('del','Schedule::del');    
+    $routes->get('list/(:any)','Schedule::list/$1');    
+    $routes->get('listDPS/(:any)/(:any)/(:any)/(:any)','Schedule::listDPS/$1/$2/$3/$4');    
+    $routes->get('listSeries/(:any)','Schedule::listSeries/$1');    
+    $routes->get('listDisciplines/(:any)','Schedule::getTotalScheduleByDiscipline/$1');    
+    $routes->post('replace','Schedule::replace');    
 });
 
 // We get a performance increase by specifying the default

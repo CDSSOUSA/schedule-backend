@@ -235,7 +235,7 @@ class Year extends ResourceController
        
     }
 
-    public function showById(int $id)
+    public function show($id = null)
     {         
 
         try {
@@ -252,7 +252,7 @@ class Year extends ResourceController
         
     }
 
-    public function updateData()
+    public function update($id = null)
     {
         if ($this->request->getMethod() !== 'post') {
             return redirect()->to('/admin/blog');
