@@ -189,7 +189,7 @@ class Series extends ResourceController
                 'status' => 'ERROR',
                 'error' => true,
                 'code' => 400,
-                'msg' => $this->messageError,
+                'msg' => $this->messageError->getMessageError(),
                 'msgs' => $this->validator->getErrors()
             ];
 
