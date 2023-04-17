@@ -81,7 +81,7 @@ $routes->group('/teacher',['namespace'=>'App\Controllers\Teacher'],function ($ro
     $routes->post('create', 'Teacher::create'); 
     $routes->post('update', 'Teacher::update'); 
     $routes->post('delete', 'Teacher::delete'); 
-    $routes->get('edit/(:any)', 'Teacher::show/$1'); 
+    //$routes->get('edit/(:any)', 'Teacher::show/$1'); 
     
 });
 
@@ -90,13 +90,25 @@ $routes->group('/allocation',['namespace'=>'App\Controllers\Allocation',/*'filte
     //$routes->get('/', 'YearSchool::index');
     //$routes->get('list', 'YearSchool::list');
     $routes->post('create', 'Allocation::create');
-    $routes->get('showTeacher/(:any)', 'Allocation::showTeacher/$1');
+    $routes->get('showTeacherOcupation/(:any)', 'Allocation::showTeacherOcupation/$1');
     $routes->get('showTeacherChecked/(:any)', 'Allocation::showTeacherChecked/$1');
     $routes->get('getTotalAllocationTeacher/(:any)', 'Allocation::getTotalAllocationTeacher/$1');
     $routes->get('show/(:any)', 'Allocation::show/$1');
-    $routes->post('del', 'Allocation::allocationDel');
+    $routes->post('delete', 'Allocation::delete');
     //$routes->post('active', 'YearSchool::active');
    
+});
+
+$routes->group('/teacDisc',['namespace'=>'App\Controllers\TeacDisc'],function ($routes){
+    $routes->get('list/(:any)','TeacDisc::list/$1');
+    $routes->get('show/(:any)','TeacDisc::show/$1');
+    //$routes->get('edit/(:any)','TeacDisc::edit/$1');
+    //$routes->get('delete/(:any)','TeacDisc::delete/$1');
+    $routes->post('create','TeacDisc::create');
+    //$routes->get('add_profissional_horario/(:any)/(:any)/(:any)','Horario::addProfissionalHorario/$1/$2/$3');   
+    //$routes->post('create', 'Professor::create'); 
+    $routes->post('update', 'TeacDisc::update'); 
+    $routes->post('delete', 'TeacDisc::delete'); 
 });
 
 $routes->group('/schedule',['namespace'=>'App\Controllers\Schedule'],function ($routes){

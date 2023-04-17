@@ -123,7 +123,7 @@ class Allocation extends ResourceController
         //return $this->response->setJSON($response);
     }
 
-    public function showTeacher(int $id)
+    public function showTeacherOcupation(int $id)
     {
         try {
 
@@ -153,7 +153,7 @@ class Allocation extends ResourceController
     {
         try {
 
-            $data = $this->allocationModel->getAllocationTeacherAll($id);  
+            $data = $this->allocationModel->getTotalAllocationTeacherAll($id);  
             // atencao apra o metodo  getAllocationTeacher        
 
             return $this->response->setJSON($data);
@@ -175,7 +175,7 @@ class Allocation extends ResourceController
 
     }
 
-    public function allocationDel()
+    public function delete($id = null)
     {
         //$idAlocacao = $this->request->getPost('id_teacher"');
         $data['id'] = $this->request->getPost('id_teacher');
@@ -189,7 +189,7 @@ class Allocation extends ResourceController
                 array_push($allocationProtected, $item);
             }
         }
-                
+
         try {
 
             $allocationFree = $this->allocationModel->getAllocationTeacherFree($data['id']);

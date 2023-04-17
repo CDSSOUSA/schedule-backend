@@ -242,7 +242,7 @@ class AlloccationModel extends Model
             ->orderBy($this->table . '.situation DESC, ' . $this->table . '.shift ASC, ' . $this->table . '.dayWeek ASC, ' . $this->table . '.position ASC')
             ->get()->getResult();
     }
-    public function getAllocationTeacherAll(int $idTeacher)
+    public function getTotalAllocationTeacherAll(int $idTeacher)
     {
         return $this->join('tb_teacher_discipline pd', 'pd.id = ' . $this->table . '.id_teacher_discipline')
             ->join('tb_teacher t', 't.id = pd.id_teacher')
