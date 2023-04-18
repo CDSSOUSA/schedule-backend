@@ -40,4 +40,11 @@ class DisciplineModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getLimitClassroom(int $id)
+    {
+        return $this->select('amount')
+        ->where('id',$id)
+        ->get()->getRow();
+    }
 }

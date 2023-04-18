@@ -93,7 +93,7 @@ class Schedule extends ResourceController
                     $hor[] = $h->id_teacher;
                 }
 
-                $allocationDisponivel2 = $this->allocationModel->getAllocationByDayWeekAB($idSerie, $dw, $ps, $shift, $hor);
+                $allocationDisponivel2 = $this->allocationModel->getAllocationByDayWeekAB($idSerie, $dw, $ps, $shift, $hor, $qual = null);
 
                 //dd($allocationDisponivel2);
             }
@@ -192,14 +192,14 @@ class Schedule extends ResourceController
                     // if($disciplineTeacher != null) {
                     $disciplina = new DisciplineModel();
                     $disci = $disciplina->findAll();
-                    
+
                     foreach ($disciplineTeacherOcupados as $is) {
 
-                        $dis[] = $is->id_discipline;                        
-                        $tea[] = $is->id_teacher;                     
+                        $dis[] = $is->id_discipline;
+                        $tea[] = $is->id_teacher;
                         //$tea[] = $is->id_teacher;                      
-                       
-                    }      
+
+                    }
 
                     // busca professores de outras disciplinas
                     $profDisciplinaPermitida = $this->allocationModel->getAllocationByDayWeek($idSerie, $dayWeek, $position, $shift, $dis,);
@@ -207,7 +207,6 @@ class Schedule extends ResourceController
                     foreach ($profDisciplinaPermitida as $itenPermitido) {
 
                         $tea[] = $itenPermitido['id_teacher'];
-
                     }
 
                     // foreach ($disci as $discipl) {
@@ -215,12 +214,12 @@ class Schedule extends ResourceController
                     //     if (in_array($discipl->id, $dis)) {
 
                     //         $profPermitida[] = $tea;                               
-                            
+
                     //     }
                     //     break;
-                        
+
                     // }       
-                         
+
 
                     //var_dump($tea);
 
@@ -237,14 +236,13 @@ class Schedule extends ResourceController
                 // } else 
                 if ($limits != null) {
                     //var_dump('aqui no limits');
-                    if($tea != null) {
+                    if ($tea != null) {
                         //var_dump('aqui no tea');
                         $data = $this->allocationModel->getAllocationByDayWeek($idSerie, $dayWeek, $position, $shift, $limits);
                     } else {
-                             $data = $this->allocationModel->getAllocationByDayWeekABCDE($idSerie, $dayWeek, $position, $shift, $tea);
-                             
-                         }
-                }  
+                        $data = $this->allocationModel->getAllocationByDayWeekABCDE($idSerie, $dayWeek, $position, $shift, $tea);
+                    }
+                }
                 // else if($disciplineTeacher != null){
 
                 //     $data = $this->allocationModel->getAllocationByDayWeekABC($idSerie, $dayWeek, $position, $shift, $limits, $dis, $tea);
@@ -260,13 +258,13 @@ class Schedule extends ResourceController
                         foreach ($horario as $h) {
                             $hor[] = $h->id_teacher;
                         }
-                        $ar = array_merge($tea,$hor);
+                        $ar = array_merge($tea, $hor);
                         //$hor[] = $tea;
                         //var_dump($hor);
                         //exit();
                         //var_dump('tem horario');
 
-                        $data = $this->allocationModel->getAllocationByDayWeekAB($idSerie, $dayWeek, $position, $shift, $hor);
+                        $data = $this->allocationModel->getAllocationByDayWeekAB($idSerie, $dayWeek, $position, $shift, $hor, $qual = null);
                     } else {
                         //var_dump('sem horario');
                         //$data = $this->allocationModel->getAllocationByDayWeekA($idSerie, $dayWeek, $position, $shift);
@@ -305,6 +303,102 @@ class Schedule extends ResourceController
             'msg'      => 'Nenhum usuário encontrado para essa pesquisa!',
         ]);
     }
+    public function getAllocationDisponivel(int $idSerie, int $dayWeek, int $position, string $shift)
+    {
+
+
+        try {
+
+            $disciplinesNaoPermitidas = [];
+            $teacherPermitidos = [];
+            $dis = [];
+
+            $datas = $this->scheduleModel->getTotalDiscBySerie($idSerie);
+
+
+
+            if ($datas == null) {
+
+                $response = $this->allocationModel->getAllocationFree($dayWeek, $position, $shift);
+
+                return $this->response->setJSON($response);
+            } else {
+                //return $this->response->setJSON($datas);
+                foreach ($datas as $item) {
+
+                    $limitAulasDisciplina = $this->disciplineModel->getLimitClassroom($item->id);
+
+                    if ($limitAulasDisciplina->amount <= $item->total) {
+                        $disciplinesNaoPermitidas[] = $item->id;
+                    }
+
+                    $teacherPermitidos[] = $item->id_teacher;
+                }
+
+
+                
+
+                $disciplineTeacherOcupados = $this->scheduleModel->getDisciplineTeacher($idSerie);
+
+                
+                foreach ($disciplineTeacherOcupados as $is) {
+                    
+                    $dis[] = $is->id_discipline;
+                }
+                
+                $profDisciplinaPermitida = $this->allocationModel->getAllocationByDayWeek($idSerie, $dayWeek, $position, $shift, $dis,);
+                
+                
+                foreach ($profDisciplinaPermitida as $itenPermitido) {
+                    
+                    $teacherPermitidos[] = $itenPermitido['id_teacher'];
+                }
+
+                if ($disciplinesNaoPermitidas != null) {
+                    $response = $this->allocationModel->getAllocationFreeSemAsDisciplinesNãoPermitidas($dayWeek, $position, $shift, $disciplinesNaoPermitidas, $teacherPermitidos);
+                    //$response['origem'] = 'disciplinas nao permitida';
+                    return $this->response->setJSON($response);
+                }
+                
+                $response = $this->allocationModel->getAllocationByDayWeekABCDE($idSerie, $dayWeek, $position, $shift, $teacherPermitidos);
+                               
+                return $this->response->setJSON($response);
+            }
+
+            //return $this->response->setJSON($datas);
+
+
+            // if ($datas != null) {
+
+            //     foreach ($datas as $d) {
+
+            //         $limit = $this->disciplineModel->getLimitClassroom($d->id);
+
+            //         if ($limit->amount <= $d->total) {
+            //             $limits[] = $d->id;
+            //         }
+            //     }
+
+            //     if($limits != null) {
+
+            //         $data = $this->allocationModel->getAllocationByDayWeek($idSerie, $dayWeek, $position, $shift, $limits);
+            //     }
+
+            // } else {
+
+            //     $data = $this->allocationModel->getAllocationByDayWeekA($idSerie, $dayWeek, $position, $shift);
+            // }
+
+            // return $this->response->setJSON($data);
+
+        } catch (Exception $e) {
+            return $this->response->setJSON([
+                'response' => 'Erros',
+                'msg'      => 'Não foi possível executar a operação',
+                'error'    => $e->getMessage()
+            ]);
+        }
+    }
     public function getOcupationSchedule(int $idAllocation)
     {
         try {
@@ -321,7 +415,8 @@ class Schedule extends ResourceController
         }
     }
 
-    public function getTotalScheduleByDiscipline($idDiscipline){
+    public function getTotalScheduleByDiscipline($idDiscipline)
+    {
         try {
 
             $data = $this->scheduleModel->getTotalScheduleByDiscipline($idDiscipline);
@@ -334,7 +429,6 @@ class Schedule extends ResourceController
                 'error'    => $e->getMessage()
             ]);
         }
-
     }
     public function create()
     {
@@ -459,7 +553,7 @@ class Schedule extends ResourceController
 
                     $delete = $this->scheduleModel->where('id', $data->id)
                         ->delete();
-                        
+
                     if ($delete) {
                         $response = [
                             'status' => 'OK',
@@ -484,7 +578,7 @@ class Schedule extends ResourceController
         ]);
     }
 
-    public function deleteSchedule(int $id)
+    public function show($id = null)
     {
 
         try {
@@ -560,17 +654,15 @@ class Schedule extends ResourceController
 
         $allocationTeacher = $this->allocationModel->getAllocationTeacherOcupationReplace($horario['idTeacher']);
 
-        foreach($allocationTeacher as $item) {
+        foreach ($allocationTeacher as $item) {
 
             $this->allocationModel->set('situation', 'L')
-                    ->where('id', $item->id)
-                    ->where('situation', 'O')
-                    ->where('id_year_school', session('session_idYearSchool'))
-                    ->update();
+                ->where('id', $item->id)
+                ->where('situation', 'O')
+                ->where('id_year_school', session('session_idYearSchool'))
+                ->update();
 
-            $this->scheduleModel->deleteScheduleForAllocation($item->id);            
-                    
-
+            $this->scheduleModel->deleteScheduleForAllocation($item->id);
         }
 
         $response = [

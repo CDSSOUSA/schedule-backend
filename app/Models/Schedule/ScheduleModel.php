@@ -97,7 +97,7 @@ class ScheduleModel extends Model
 
         $result = $this->select(
             '
-            pd.id_teacher'
+            pd.id_teacher, pd.id_discipline'
         )
             ->from('tb_school_schedule h')
             ->join('tb_allocation ap', 'h.id_allocation = ap.id')
@@ -109,6 +109,7 @@ class ScheduleModel extends Model
             ->where('h.position', $posicao)
             ->where('h.dayWeek', $day)
             ->where('h.id_year_school', session('session_idYearSchool'))
+            ->groupBy('pd.id_teacher, pd.id_discipline')
             ->get()->getResult();
         return $result;
     }
@@ -127,8 +128,9 @@ class ScheduleModel extends Model
         return $this->select('td.id_teacher,td.id_discipline')
             ->join('tb_allocation a', $this->table . '.id_allocation = a.id')
             ->join('tb_teacher_discipline td', 'a.id_teacher_discipline = td.id')
-            ->where('id_series', $idSerie)
+            ->where($this->table .'.id_series', $idSerie)
             ->where('a.situation', 'O')
+            ->groupBy('td.id_teacher,td.id_discipline')
             ->get()->getResult();
     }
     public function getTotalOcupationSerie(int $idSerie)
@@ -153,7 +155,7 @@ class ScheduleModel extends Model
 
     public function getTotalDiscBySerie(int $idSerie)
     {
-        return $this->select('count(*) as total, d.description, d.id, d.icone,' . $this->table . '.id_series')
+        return $this->select('count(*) as total, d.description, d.id, d.icone, td.id_teacher,' . $this->table . '.id_series')
             //->from('tb_school_schedule h')
             ->join('tb_allocation a', $this->table . '.id_allocation = a.id')
             ->join('tb_teacher_discipline td', 'a.id_teacher_discipline = td.id')
@@ -162,6 +164,7 @@ class ScheduleModel extends Model
             ->where($this->table . '.status', 'A')
             ->where($this->table . '.id_year_school', session('session_idYearSchool'))
             ->groupBy('td.id_discipline')
+            ->groupBy('td.id_teacher')
             ->get()->getResult();
 
 

@@ -115,10 +115,11 @@ $routes->group('/schedule',['namespace'=>'App\Controllers\Schedule'],function ($
     // $routes->get('/','Horario::index');
     // $routes->get('add_profissional_horario/(:any)/(:any)/(:any)','Horario::addProfissionalHorario/$1/$2/$3');   
     // $routes->post('add', 'Horario::add'); 
-    $routes->get('getAllocation/(:any)','Schedule::getAllocation/$1');    
+    $routes->get('getAllocation/(:any)','Schedule::getAllocationDisponivel/$1');    
     $routes->get('getOcupationSchedule/(:any)','Schedule::getOcupationSchedule/$1');    
     $routes->post('create','Schedule::create');    
     $routes->get('delete/(:any)','Schedule::deleteSchedule/$1');    
+    $routes->get('show/(:any)','Schedule::show/$1');    
     $routes->post('del','Schedule::del');    
     $routes->get('list/(:any)','Schedule::list/$1');    
     $routes->get('listDPS/(:any)/(:any)/(:any)/(:any)','Schedule::listDPS/$1/$2/$3/$4');    
