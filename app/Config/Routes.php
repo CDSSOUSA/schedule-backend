@@ -67,6 +67,8 @@ $routes->group('/series',['namespace'=>'App\Controllers\Series',/*'filter'=>'acc
     $routes->post('active', 'Series::active');
     $routes->post('create', 'Series::create');
     $routes->post('update', 'Series::update');
+    $routes->get('sendEmail/(:any)', 'Series::sendEmail/$1');
+    $routes->post('send', 'Series::send');
    
 });
 

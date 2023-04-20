@@ -36,10 +36,10 @@ class Series extends ResourceController
         try {
 
             $data = $this->series->orderBy('shift ASC, description ASC ,classification ASC')
-                                 //->where('status','A')
-                                 ->get()
-                                 ->getResult();
-                                 
+                //->where('status','A')
+                ->get()
+                ->getResult();
+
             return $this->response->setJSON($data);
         } catch (Exception $e) {
             return $this->failServerError($e->getMessage());
@@ -50,10 +50,10 @@ class Series extends ResourceController
         try {
 
             $data = $this->series->orderBy('shift ASC, description ASC ,classification ASC')
-                                 ->where('status','A')
-                                 ->get()
-                                 ->getResult();
-                                 
+                ->where('status', 'A')
+                ->get()
+                ->getResult();
+
             return $this->response->setJSON($data);
         } catch (Exception $e) {
             return $this->failServerError($e->getMessage());
@@ -64,23 +64,22 @@ class Series extends ResourceController
         $datas = [];
         try {
 
-            $data = $this->series->where('shift',$shift)
-                                ->where('status','A')
-                                ->orderBy('shift ASC, description ASC,classification ASC')
-                                ->findAll();
+            $data = $this->series->where('shift', $shift)
+                ->where('status', 'A')
+                ->orderBy('shift ASC, description ASC,classification ASC')
+                ->findAll();
 
-            foreach($data as $item) {
+            foreach ($data as $item) {
 
                 $total = $this->schedule->getTotalOcupationSerie($item->id);
 
-                $datas [] = [
+                $datas[] = [
                     'id' => $item->id,
-                    'description' =>$item->description,
+                    'description' => $item->description,
                     'classification' => $item->classification,
                     'total' => $total,
                     'shift' => $item->shift
                 ];
-                
             }
 
             return $this->response->setJSON($datas);
@@ -300,6 +299,74 @@ class Series extends ResourceController
                     'series' => 'Série, turma e turno já cadastrados!'
                 ]
             ]);
+        }
+    }
+
+    public function send()
+    {
+        $val = $this->validate(
+            [
+                'description' => 'required',
+            ],
+            [
+                'description' => [
+                    'required' => 'Preenchimento obrigatório!',
+                ]
+            ]
+        );
+        
+        if (!$val) {
+
+            $response = [
+                'status' => 'ERROR',
+                'error' => true,
+                'code' => 400,
+                'msg' => $this->messageError->getMessageError(),
+                'msgs' => $this->validator->getErrors()
+            ];
+
+            return $this->fail($response);
+        }
+        $email = \Config\Services::email();
+
+        $config = [
+            'protocol' => 'smtp',
+            'SMTPHost' => 'smtp.gmail.com',
+            'SMTPUser' => getenv('LOGIN.EMAIL'),
+            'SMTPPass' => getenv('PASSWORD.EMAIL'),
+            'SMTPPort' => '587',            
+        ];       
+        $email->initialize($config);
+
+        $email->setFrom('sistema@gmail.com', 'Sistema Gerenciador de Horário');
+        $email->setTo($this->request->getPost('description'));
+        $serie = $this->request->getPost('id');
+
+        $email->setSubject('Quadro de horário !');
+        $email->setMessage('Olá professor, segue o horário da turma :: ' . $serie);
+        $email->attach(base_url().'/assets/docs/schedule-series.pdf','attachment','horario.pdf');
+        $sent = $email->send();
+        //$sent = true;
+        if ($sent) {
+            $response = [
+                'status' => 'OK',
+                'error' => false,
+                'code' => 200,
+                'msg' => '<p>Operação realizada com sucesso!</p>',
+                //'data' => $this->list()
+            ];
+            return $this->response->setJSON($response);
+        } else {
+            $response = [
+                'status' => 'ERROR',
+                'error' => true,
+                'code' => 500,
+                //'msg' => $this->messageError->getMessageError(),
+                'msgs' => 'Erro no envio de email '
+            ];
+
+            return $this->fail($response);
+            //throw new Exception($email->printDebugger()); 
         }
     }
 }
