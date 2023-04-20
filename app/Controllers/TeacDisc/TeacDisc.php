@@ -3,7 +3,7 @@
 namespace App\Controllers\TeacDisc;
 
 use App\Libraries\Messages;
-use App\Models\Allocation\AlloccationModel;
+use App\Models\Allocation\AllocationModel;
 use App\Models\Discipline\DisciplineModel;
 use App\Models\TeacDisc\TeacDiscModel;
 use App\Models\Teacher\TeacherModel;
@@ -23,7 +23,7 @@ class TeacDisc extends ResourceController
         $this->teacDiscModel = new TeacDiscModel();
         $this->teacherModel = new TeacherModel();
         $this->disciplineModel = new DisciplineModel();
-        $this->allocationModel = new AlloccationModel();
+        $this->allocationModel = new AllocationModel();
         $this->messageError = new Messages();
         helper('utils');
     }

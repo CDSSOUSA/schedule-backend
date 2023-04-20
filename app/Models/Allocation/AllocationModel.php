@@ -4,7 +4,7 @@ namespace App\Models\Allocation;
 
 use CodeIgniter\Model;
 
-class AlloccationModel extends Model
+class AllocationModel extends Model
 {
     protected $DBGroup          = 'default';
     protected $table            = 'tb_allocation';

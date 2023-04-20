@@ -2,7 +2,7 @@
 
 namespace App\Models\Series;
 
-use App\Models\Allocation\AlloccationModel;
+use App\Models\Allocation\AllocationModel;
 use App\Models\Schedule\ScheduleModel;
 use CodeIgniter\Model;
 
@@ -67,7 +67,7 @@ class SeriesModel extends Model
 
         if($status == 'I'){
 
-            $allocationModel = new AlloccationModel();
+            $allocationModel = new AllocationModel();
             $schedule = new ScheduleModel();
     
             $dataSchedule = $schedule->where('id_series', $data['id'])->findAll();

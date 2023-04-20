@@ -3,7 +3,7 @@
 namespace App\Controllers\Teacher;
 
 use App\Libraries\Messages;
-use App\Models\Allocation\AlloccationModel;
+use App\Models\Allocation\AllocationModel;
 use App\Models\Discipline\DisciplineModel;
 use App\Models\TeacDisc\TeacDiscModel;
 use App\Models\Teacher\TeacherModel;
@@ -22,7 +22,7 @@ class Teacher extends ResourceController
         $this->teacherModel = new TeacherModel();
         $this->disciplineModel = new DisciplineModel();
         $this->teacDiscModel = new TeacDiscModel();
-        $this->allocationModel = new AlloccationModel();
+        $this->allocationModel = new AllocationModel();
         $this->messageError = new Messages();
         //$this->validateToken = new Services();
         helper('utils');

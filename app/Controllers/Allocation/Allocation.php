@@ -3,7 +3,7 @@
 namespace App\Controllers\Allocation;
 
 use App\Libraries\Messages;
-use App\Models\Allocation\AlloccationModel;
+use App\Models\Allocation\AllocationModel;
 use CodeIgniter\RESTful\ResourceController;
 use Exception;
 
@@ -13,7 +13,7 @@ class Allocation extends ResourceController
     private $messageError;
     public function __construct()
     {
-        $this->allocationModel = new AlloccationModel();
+        $this->allocationModel = new AllocationModel();
         $this->messageError = new Messages();
        
     }

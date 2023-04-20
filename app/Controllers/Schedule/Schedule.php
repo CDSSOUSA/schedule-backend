@@ -3,7 +3,7 @@
 namespace App\Controllers\Schedule;
 
 
-use App\Models\Allocation\AlloccationModel;
+use App\Models\Allocation\AllocationModel;
 use App\Models\Discipline\DisciplineModel;
 use App\Models\Schedule\ScheduleModel;
 use App\Models\Series\SeriesModel;
@@ -20,7 +20,7 @@ class Schedule extends ResourceController
     private $seriesModel;
     public function __construct()
     {
-        $this->allocationModel = new AlloccationModel();
+        $this->allocationModel = new AllocationModel();
         $this->scheduleModel = new ScheduleModel();
         $this->teacDiscModel = new TeacDiscModel();
         $this->disciplineModel = new DisciplineModel();

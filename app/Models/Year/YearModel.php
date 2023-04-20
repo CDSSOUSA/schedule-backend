@@ -2,6 +2,7 @@
 
 namespace App\Models\Year;
 
+use App\Models\Allocation\AllocationModel;
 use App\Models\Allocation\AloccationModel;
 use App\Models\Schedule\ScheduleModel;
 use App\Models\Series\SeriesModel;
@@ -47,7 +48,7 @@ class YearModel extends Model
 
     public function updateYearSchool(array $data)
     {
-        $updateAllocation = new AloccationModel();
+        $updateAllocation = new AllocationModel();
         $updateSeries = new SeriesModel();
         $updateSchedule = new ScheduleModel();
         $updateTeacDisc = new TeacDiscModel();
