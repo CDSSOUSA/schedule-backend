@@ -5,8 +5,10 @@ namespace App\Controllers\Series;
 use App\Libraries\Messages;
 use App\Models\Schedule\ScheduleModel;
 use App\Models\Series\SeriesModel;
+use App\Models\Year\YearModel;
 use CodeIgniter\RESTful\ResourceController;
 use Exception;
+use FilesystemIterator;
 
 class Series extends ResourceController
 {
@@ -14,12 +16,15 @@ class Series extends ResourceController
     private $schedule;
     private $messageError;
 
+    private $year;
+
 
     public function __construct()
     {
         $this->series = new SeriesModel();
         $this->schedule = new ScheduleModel();
         $this->messageError = new Messages();
+        $this->year = new YearModel();
     }
     public function show($id = null)
     {
@@ -304,6 +309,47 @@ class Series extends ResourceController
 
     public function send()
     {
+        $serie = $this->request->getPost('serie');
+
+        $idSerie = $this->request->getPost('id');
+
+        $dirSeries = str_replace(['º', 'MANHÃ', ' '], ['-', 'MANHA', ''], $serie);
+
+        $dirYear = $this->year->getYearActive()[0]->description;
+
+        $urlArchive = '././assets/docs/' . $dirYear . '/' . $dirSeries;
+
+        //dd($urlArchive);
+        if (!is_dir($urlArchive)) {
+            $h = mkdir($urlArchive, 0777, true);
+            chmod($urlArchive, 0777);
+        }
+
+        chdir($urlArchive);
+
+        //touch('jose.pdf');
+        // // atençao
+        // gerar o pdf na pasta da serie
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, 'http://localhost/schedule-report/public/report/series/' . $idSerie);
+        curl_exec($curl);
+        var_dump(curl_getinfo($curl));
+        curl_close($curl);
+
+        // depois buscalo na pasta e envir
+
+   
+
+        $arch = new FilesystemIterator('/var/www/html/schedule-backend/public/assets/docs/' . $dirYear . '/' . $dirSeries);
+        $nameFile = '';
+
+        foreach ($arch as $file) {
+            $nameFile = $file->getFilename();
+        }
+
+        var_dump($nameFile);
+
+
         $val = $this->validate(
             [
                 'description' => 'required',
@@ -314,7 +360,7 @@ class Series extends ResourceController
                 ]
             ]
         );
-        
+
         if (!$val) {
 
             $response = [
@@ -327,6 +373,8 @@ class Series extends ResourceController
 
             return $this->fail($response);
         }
+
+
         $email = \Config\Services::email();
 
         $config = [
@@ -334,17 +382,23 @@ class Series extends ResourceController
             'SMTPHost' => 'smtp.gmail.com',
             'SMTPUser' => getenv('LOGIN.EMAIL'),
             'SMTPPass' => getenv('PASSWORD.EMAIL'),
-            'SMTPPort' => '587',            
-        ];       
+            'SMTPPort' => '587',
+            'mailType' => 'html'
+        ];
         $email->initialize($config);
 
-        $email->setFrom('sistema@gmail.com', 'Sistema Gerenciador de Horário');
+        $email->setFrom('sistema@gmail.com', 'Sistema Gerenciador de Horário Escolar');
         $email->setTo($this->request->getPost('description'));
-        $serie = $this->request->getPost('id');
 
-        $email->setSubject('Quadro de horário !');
-        $email->setMessage('Olá professor, segue o horário da turma :: ' . $serie);
-        $email->attach(base_url().'/assets/docs/schedule-series.pdf','attachment','horario.pdf');
+        $template = view('template/email/series', ['nameTeacher'=>'Arnaldo Augusto Nora Antunes Filho','series'=> $serie.' - '. $dirYear]);
+
+        //$serie = $this->request->getPost('id');
+
+        $email->setSubject('Quadro de horário!');
+        //$email->setMessage('Olá professor, segue o horário da turma :: ' . $serie.' - '. $dirYear);
+        $email->setMessage($template);
+
+        $email->attach(base_url() . '/assets/docs/' . $dirYear . '/' . $dirSeries . '/'.$nameFile, 'attachment', $nameFile);
         $sent = $email->send();
         //$sent = true;
         if ($sent) {

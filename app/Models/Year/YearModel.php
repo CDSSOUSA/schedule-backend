@@ -122,7 +122,7 @@ class YearModel extends Model
 
     public function getYearActive()
     {
-        return $this->select('id')
+        return $this->select('id, description')
             ->where('status', 'A')
             ->get()
             ->getResult();
